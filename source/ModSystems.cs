@@ -15,6 +15,8 @@ public sealed class OverhaulLibSystem : ModSystem
     
     public override void StartPre(ICoreAPI api)
     {
+        TagsUtil.Api = api;
+
         LogLoadedMods(api);
 
         _shapesCache = new(api, "Shapes", TimeSpan.FromMinutes(10), threadSafe: true);
@@ -32,6 +34,8 @@ public sealed class OverhaulLibSystem : ModSystem
     public override void Dispose()
     {
         _shapesCache?.Dispose();
+
+        TagsUtil.Api = null;
     }
 
 
