@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ModName>Overhaul lib</ModName>
     <ModType>code</ModType>
-    <ModVersion>2.0.3</ModVersion>
+    <ModVersion>2.0.4</ModVersion>
     <ModId>overhaullib</ModId>
     <Description></Description>
     <Side>universal</Side>

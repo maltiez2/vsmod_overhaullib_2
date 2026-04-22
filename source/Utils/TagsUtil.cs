@@ -7,13 +7,13 @@ public static class TagsUtil
 {
     public static ICoreAPI? Api { get; set; }
 
-    public static TagSet Get(params string[] tags) => Api!.CollectibleTagRegistry.CreateTagSet(tags as IEnumerable<string>);
+    public static TagSet Get(params string[] tags) => Api!.CollectibleTagRegistry.CreateTagSet((ReadOnlySpan<string>)tags);
 
     public static TagSet Union(this TagSet first, TagSet second)
     {
         IEnumerable<string> firstTags = Api!.CollectibleTagRegistry.SlowEnumerateTagNames(first);
         IEnumerable<string> secondTags = Api!.CollectibleTagRegistry.SlowEnumerateTagNames(second);
-        return Api!.CollectibleTagRegistry.CreateTagSet(firstTags.Union(secondTags));
+        return Api!.CollectibleTagRegistry.CreateTagSet(firstTags.Concat(secondTags));
     }
 
     public static TagSet Union(this TagSet first, params string[] tags) => first.Union(Get(tags));
@@ -84,4 +84,8 @@ public static class TagsUtil
     }
 
     public static bool SetEquals(this TagSet first, params string[] tags) => first.SetEquals(Get(tags));
+
+    public static TagSet GetTagSet(this ICoreAPI api, params string[] tags) => api.CollectibleTagRegistry.CreateTagSet((ReadOnlySpan<string>)tags);
+
+    public static void RegisterTags(this ICoreAPI api, params string[] tags) => api.CollectibleTagRegistry.Register((ReadOnlySpan<string>)tags);
 }
