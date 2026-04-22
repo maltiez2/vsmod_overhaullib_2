@@ -45,7 +45,7 @@ public static class Log
     public static string Format(object caller, string format)
     {
         DefaultInterpolatedStringHandler defaultInterpolatedStringHandler = new(4, 3);
-        defaultInterpolatedStringHandler.AppendLiteral(" [");
+        defaultInterpolatedStringHandler.AppendLiteral("[");
         defaultInterpolatedStringHandler.AppendFormatted(caller.GetType().Assembly.GetName().Name);
         defaultInterpolatedStringHandler.AppendLiteral("] [");
         defaultInterpolatedStringHandler.AppendFormatted(GetCallerTypeName(caller));
@@ -56,7 +56,7 @@ public static class Log
     public static string Format(Type type, string format)
     {
         DefaultInterpolatedStringHandler defaultInterpolatedStringHandler = new(4, 3);
-        defaultInterpolatedStringHandler.AppendLiteral(" [");
+        defaultInterpolatedStringHandler.AppendLiteral("[");
         defaultInterpolatedStringHandler.AppendFormatted(type.Assembly.GetName().Name);
         defaultInterpolatedStringHandler.AppendLiteral("] [");
         defaultInterpolatedStringHandler.AppendFormatted(GetTypeName(type));

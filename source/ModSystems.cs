@@ -5,19 +5,18 @@ using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
-using Vintagestory.API.Util;
 
 namespace OverhaulLib;
 
 public sealed class OverhaulLibSystem : ModSystem
 {
     public override double ExecuteOrder() => 0;
-    
+
     public override void StartPre(ICoreAPI api)
     {
         TagsUtil.Api = api;
 
-        LogLoadedMods(api);
+        LoadedModsLogger.LogLoadedMods(api);
 
         _shapesCache = new(api, "Shapes", TimeSpan.FromMinutes(10), threadSafe: true);
         ShapeLoadingUtil.ShapesCache = _shapesCache;
@@ -67,26 +66,6 @@ public sealed class OverhaulLibSystem : ModSystem
             RegisterCustomIcon(api, iconCode, iconPath);
         }
         Log.Verbose(api, typeof(OverhaulLibSystem), loadedIconsList.ToString());
-    }
-
-    private static void LogLoadedMods(ICoreAPI api)
-    {
-        StringBuilder modsList = new();
-        api.ModLoader.Mods
-            .Select(mod => $"'{mod.Info.ModID}'\t'{mod.Info.Version}'\t'{mod.Info.Name}'\t'{mod.FileName}''\t'{AggregateModAuthors(mod.Info.Authors, mod)}")
-            .Foreach(mod => modsList.AppendLine(mod));
-        api.Logger.Event("Loaded mods:\n" + modsList.ToString());
-    }
-
-    private static string AggregateModAuthors(IEnumerable<string> list, Mod mod)
-    {
-        if (!list.Any())
-        {
-            mod.Logger.Warning($"Mod '{mod.Info.Name} ({mod.FileName})' has no authors specified in mod info.");
-            return "-";
-        }
-
-        return list.Aggregate((f, s) => $"{f}, {s}");
     }
 
     private static void RegisterCustomIcon(ICoreClientAPI api, string key, string path)

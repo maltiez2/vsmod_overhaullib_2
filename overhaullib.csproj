@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ModName>Overhaul lib</ModName>
     <ModType>code</ModType>
-    <ModVersion>2.0.2</ModVersion>
+    <ModVersion>2.0.3</ModVersion>
     <ModId>overhaullib</ModId>
     <Description></Description>
     <Side>universal</Side>
@@ -14,11 +14,6 @@
   <!-- Authors -->
   <ItemGroup>
     <ModInfoAuthors Include="Maltiez" />
-  </ItemGroup>
-
-  <!-- Dependencies -->
-  <ItemGroup>
-    <Dependencies Include="game" Version="*" />
   </ItemGroup>
 
   <!-- Project settings -->
