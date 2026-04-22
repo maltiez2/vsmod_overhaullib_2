@@ -81,7 +81,9 @@ public static class ShapeLoadingUtil
             };
             newFaces.Add(newFace);
         }
-        element.FacesResolved = newFaces.ToArray();
+#pragma warning disable CS8601 // Possible null reference assignment. - Vanilla has wrong nullability here
+        element.FacesResolved = [.. newFaces];
+#pragma warning restore CS8601 // Possible null reference assignment.
     }
     public static void WalkShapeElements(ShapeElement element, Action<ShapeElement> action)
     {
@@ -103,41 +105,44 @@ public static class ShapeLoadingUtil
         {
             return;
         }
-        
+
         Dictionary<string, string> replacedCodes = [];
         foreach (ShapeElement shapeElement in shape.Elements)
         {
             WalkShapeElements(shapeElement, element => PrefixFacesTextures(element, prefix, replacedCodes, damageEffect));
         }
-        
+
+        foreach ((string from, string to) in replacedCodes)
+        {
+            if (shape.Textures.TryGetValue(from, out AssetLocation? fromValue))
+            {
+                shape.Textures[to] = fromValue;
+            }
+            //shape.Textures.Remove(from); // Was removed to fix issues with skin parts being black
+        }
+
         Dictionary<string, int[]> textureSizesCopy = shape.TextureSizes.ShallowClone();
         shape.TextureSizes.Clear();
 
         foreach ((string code, int[] size) in textureSizesCopy)
         {
-            if (replacedCodes.ContainsKey(code))
+            if (replacedCodes.TryGetValue(code, out string? value))
             {
-                shape.TextureSizes[replacedCodes[code]] = size;
+                shape.TextureSizes[value] = size;
                 replacedCodes.Remove(code);
             }
         }
 
         foreach ((string from, string to) in replacedCodes)
         {
-            if (shape.TextureSizes.ContainsKey(from))
+            if (shape.TextureSizes.TryGetValue(from, out int[]? fromValue))
             {
-                shape.TextureSizes[to] = shape.TextureSizes[from];
+                shape.TextureSizes[to] = fromValue;
             }
             else
             {
                 shape.TextureSizes[to] = [shape.TextureWidth, shape.TextureHeight];
             }
-                
-            if (shape.Textures.ContainsKey(from))
-            {
-                shape.Textures[to] = shape.Textures[from];
-            }
-            shape.Textures.Remove(from);
         }
     }
     public static void PrefixAnimations(Shape shape, string prefix)
@@ -151,7 +156,7 @@ public static class ShapeLoadingUtil
         {
             foreach (AnimationKeyFrame animationKeyFrame in animation.KeyFrames)
             {
-                Dictionary<string, AnimationKeyFrameElement> dictionary = new();
+                Dictionary<string, AnimationKeyFrameElement> dictionary = [];
                 foreach ((string code, AnimationKeyFrameElement element) in animationKeyFrame.Elements)
                 {
                     dictionary[prefix + code] = element;
@@ -167,7 +172,7 @@ public static class ShapeLoadingUtil
         {
             return;
         }
-        
+
         element.Name = prefix + element.Name;
         if (damageEffect >= 0f)
         {
@@ -178,7 +183,11 @@ public static class ShapeLoadingUtil
         foreach (ShapeElementFace? shapeElementFace in facesResolved)
         {
             string? textureCode = shapeElementFace?.Texture;
-            if (shapeElementFace != null && shapeElementFace.Texture != null && textureCode != null && shapeElementFace.Enabled && !shapeElementFace.Texture.StartsWith(prefix))
+            if (shapeElementFace != null
+                && shapeElementFace.Texture != null
+                && textureCode != null
+                && shapeElementFace.Enabled
+                && (!shapeElementFace.Texture.StartsWith(prefix) || prefix == ""))
             {
                 shapeElementFace.Texture = prefix + shapeElementFace.Texture;
                 replacedCodes[textureCode] = prefix + textureCode;
@@ -190,7 +199,8 @@ public static class ShapeLoadingUtil
     {
         if (childShape.Elements == null || childShape.Elements.Length == 0)
         {
-            return Result.Error("Child shape does not contain any elements.");
+            return Result.Success();
+            //return Result.Warning("Child shape does not contain any elements."); // too many warnings about empty skin parts
         }
 
         Result result = Result.Success();
@@ -281,7 +291,7 @@ public static class ShapeLoadingUtil
             {
                 parentShape.TextureSizes[texutreCode] = [childShape.TextureWidth, childShape.TextureHeight];
             }
- 
+
             parentShape.Textures[texutreCode] = path;
         }
     }
