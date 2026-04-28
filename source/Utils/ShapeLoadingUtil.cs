@@ -118,7 +118,7 @@ public static class ShapeLoadingUtil
             {
                 shape.Textures[to] = fromValue;
             }
-            //shape.Textures.Remove(from); // Was removed to fix issues with skin parts being black
+            shape.Textures.Remove(from);
         }
 
         Dictionary<string, int[]> textureSizesCopy = shape.TextureSizes.ShallowClone();
