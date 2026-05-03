@@ -99,9 +99,28 @@ public static class ShapeLoadingUtil
             }
         }
     }
+    public static void PrefixElements(Shape shape, string prefix)
+    {
+        if (shape.Elements == null || prefix == "")
+        {
+            return;
+        }
+
+        foreach (ShapeElement shapeElement in shape.Elements)
+        {
+            WalkShapeElements(shapeElement, element => PrefixElementsNames(element, prefix));
+        }
+    }
+    public static void SetDamageEffect(Shape shape, float damageEffect)
+    {
+        foreach (ShapeElement shapeElement in shape.Elements)
+        {
+            WalkShapeElements(shapeElement, element => SetElementDamageEffect(element, damageEffect));
+        }
+    }
     public static void PrefixTextures(Shape shape, string prefix, float damageEffect = 0f)
     {
-        if (shape.Elements == null || shape.Textures == null)
+        if (shape.Elements == null || shape.Textures == null || prefix == "")
         {
             return;
         }
@@ -109,7 +128,7 @@ public static class ShapeLoadingUtil
         Dictionary<string, string> replacedCodes = [];
         foreach (ShapeElement shapeElement in shape.Elements)
         {
-            WalkShapeElements(shapeElement, element => PrefixFacesTextures(element, prefix, replacedCodes, damageEffect));
+            WalkShapeElements(shapeElement, element => PrefixFacesTextures(element, prefix, replacedCodes));
         }
 
         foreach ((string from, string to) in replacedCodes)
@@ -147,7 +166,7 @@ public static class ShapeLoadingUtil
     }
     public static void PrefixAnimations(Shape shape, string prefix)
     {
-        if (shape.Animations == null)
+        if (shape.Animations == null || prefix == "")
         {
             return;
         }
@@ -166,17 +185,15 @@ public static class ShapeLoadingUtil
             }
         }
     }
-    public static void PrefixFacesTextures(ShapeElement element, string prefix, Dictionary<string, string> replacedCodes, float damageEffect)
+    public static void SetElementDamageEffect(ShapeElement element, float damageEffect)
     {
-        if (element.Name == null || element.FacesResolved == null)
+        element.DamageEffect = damageEffect;
+    }
+    public static void PrefixFacesTextures(ShapeElement element, string prefix, Dictionary<string, string> replacedCodes)
+    {
+        if (element.Name == null || element.FacesResolved == null || prefix == "")
         {
             return;
-        }
-
-        element.Name = prefix + element.Name;
-        if (damageEffect >= 0f)
-        {
-            element.DamageEffect = damageEffect;
         }
 
         ShapeElementFace[] facesResolved = element.FacesResolved;
@@ -193,6 +210,15 @@ public static class ShapeLoadingUtil
                 replacedCodes[textureCode] = prefix + textureCode;
             }
         }
+    }
+    public static void PrefixElementsNames(ShapeElement element, string prefix)
+    {
+        if (element.Name == null || prefix == "")
+        {
+            return;
+        }
+
+        element.Name = prefix + element.Name;
     }
 
     public static Result StepParentShape(Shape parentShape, Shape childShape)
