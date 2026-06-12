@@ -44,7 +44,6 @@ public sealed class OverhaulLibSystem : ModSystem
     private const string _iconsPath = $"textures/{_iconsFolder}/";
     private ObjectCache<string, Shape>? _shapesCache;
 
-
     private static void LoadIcons(ICoreClientAPI api)
     {
         List<IAsset> icons = api.Assets.GetManyInCategory("textures", _iconsFolder, loadAsset: false);
