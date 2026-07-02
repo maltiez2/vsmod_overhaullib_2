@@ -9,17 +9,19 @@ public static class ShapeLoadingUtil
 {
     public static ObjectCache<string, Shape>? ShapesCache { get; set; }
 
+    public static bool LoadShapesFromCache { get; set; } = true;
+
     public static Shape? LoadShape(ICoreAPI api, AssetLocation path)
     {
         string fullPath = path.WithPathAppendixOnce(".json").WithPathPrefixOnce("shapes/");
-        if (api.Side == EnumAppSide.Client && ShapesCache?.Get(fullPath, out Shape? result) == true)
+        if (LoadShapesFromCache && api.Side == EnumAppSide.Client && ShapesCache?.Get(fullPath, out Shape? result) == true)
         {
             return CloneShape(result);
         }
 
         Shape? currentShape = Shape.TryGet(api, fullPath);
 
-        if (api.Side == EnumAppSide.Client && currentShape != null)
+        if (LoadShapesFromCache && api.Side == EnumAppSide.Client && currentShape != null)
         {
             ShapesCache?.Add(fullPath, CloneShape(currentShape));
         }
